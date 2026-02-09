@@ -939,13 +939,45 @@ IMPORTANT:
          throw new Error('The specified Ollama embedding model was not found. Please ensure the model is installed locally or select a different embedding model in the configuration.');
        }
 
-        // Clean up markdown delimiters
+        // Clean up markdown delimiters (including multiline code blocks)
       responseText = responseText.replace(/^```(?:xml)?\s*/i, '').replace(/```\s*$/i, '');
+      const codeBlockMatch = responseText.match(/```(?:xml)?\s*([\s\S]*?)```/i);
+      if (codeBlockMatch) {
+        responseText = codeBlockMatch[1].trim();
+      }
+
+      // Surface backend errors when no XML is present
+      const trimmed = responseText.trim();
+      if (!trimmed) {
+        throw new Error('Empty response from server. Check that the API is running and your API key is set in .env.');
+      }
+      if (/^Error\s*:/i.test(trimmed) || /Error preparing retriever:/i.test(trimmed)) {
+        const firstLine = trimmed.split('\n')[0]?.trim() || trimmed;
+        throw new Error(firstLine.slice(0, 300));
+      }
+      if (/Error with Openai API:/i.test(trimmed)) {
+        throw new Error('OpenAI API error. Check OPENAI_API_KEY in .env and that the key is valid.');
+      }
+      if (/Error with OpenRouter API:/i.test(trimmed)) {
+        throw new Error('OpenRouter API error. Check OPENROUTER_API_KEY in .env.');
+      }
+      if (/Error with Azure/i.test(trimmed)) {
+        throw new Error('Azure OpenAI error. Check AZURE_OPENAI_* settings in .env.');
+      }
+      if (/No valid document embeddings found/i.test(trimmed)) {
+        setEmbeddingError(true);
+        throw new Error(
+          trimmed.length > 400 ? trimmed.slice(0, 400) + '…' : trimmed
+        );
+      }
 
       // Extract wiki structure from response
       const xmlMatch = responseText.match(/<wiki_structure>[\s\S]*?<\/wiki_structure>/m);
       if (!xmlMatch) {
-        throw new Error('No valid XML found in response');
+        console.error('No valid XML in response. First 600 chars:', responseText.slice(0, 600));
+        throw new Error(
+          'No valid XML found in response. The model may have returned plain text instead of the expected structure. Try again or use a different model.'
+        );
       }
 
       let xmlText = xmlMatch[0];

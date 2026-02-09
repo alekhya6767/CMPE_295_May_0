@@ -11,9 +11,11 @@ from pydantic import BaseModel, Field
 
 from api.config import (
     get_model_config,
+    get_embedder_type,
     configs,
     OPENROUTER_API_KEY,
     OPENAI_API_KEY,
+    GOOGLE_API_KEY,
     AWS_ACCESS_KEY_ID,
     AWS_SECRET_ACCESS_KEY,
 )
@@ -83,6 +85,21 @@ async def handle_websocket_chat(websocket: WebSocket):
                     logger.warning(f"Request exceeds recommended token limit ({tokens} > 7500)")
                     input_too_large = True
 
+        # Check embedding API key before attempting to prepare retriever
+        embedder_type = get_embedder_type()
+        if embedder_type == "openai" and not (OPENAI_API_KEY and OPENAI_API_KEY.strip()):
+            await websocket.send_text(
+                "Error: Embeddings use OpenAI by default. Set OPENAI_API_KEY in your .env file (project root), then restart the API server. Alternatively set DEEPWIKI_EMBEDDER_TYPE=google and set GOOGLE_API_KEY."
+            )
+            await websocket.close()
+            return
+        if embedder_type == "google" and not (GOOGLE_API_KEY and GOOGLE_API_KEY.strip()):
+            await websocket.send_text(
+                "Error: DEEPWIKI_EMBEDDER_TYPE=google but GOOGLE_API_KEY is not set. Set GOOGLE_API_KEY in .env or use OpenAI embeddings (OPENAI_API_KEY)."
+            )
+            await websocket.close()
+            return
+
         # Create a new RAG instance for this request
         try:
             request_rag = RAG(provider=request.provider, model=request.model)
@@ -111,7 +128,15 @@ async def handle_websocket_chat(websocket: WebSocket):
         except ValueError as e:
             if "No valid documents with embeddings found" in str(e):
                 logger.error(f"No valid embeddings found: {str(e)}")
-                await websocket.send_text("Error: No valid document embeddings found. This may be due to embedding size inconsistencies or API errors during document processing. Please try again or check your repository content.")
+                hint = (
+                    " Set OPENAI_API_KEY in .env and restart the API if using OpenAI embeddings. "
+                    "If the error persists, delete the cached database so it can rebuild: "
+                    "rm -f ~/.adalflow/databases/*.pkl"
+                )
+                await websocket.send_text(
+                    "Error: No valid document embeddings found. This may be due to a missing or invalid embedding API key, embedding size inconsistencies, or a bad cache."
+                    + hint
+                )
                 await websocket.close()
                 return
             else:

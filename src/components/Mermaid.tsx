@@ -365,8 +365,13 @@ const Mermaid: React.FC<MermaidProps> = ({ chart, className = '', zoomingEnabled
         setError(null);
         setSvg('');
 
-        // Render the chart directly without preprocessing
-        const { svg: renderedSvg } = await mermaid.render(idRef.current, chart);
+        // Sanitize: quote node labels that contain parentheses so Mermaid parses them (e.g. W[Ollama (opt)] -> W["Ollama (opt)"])
+        let chartToRender = chart.replace(
+          /\[(?!["'])([^"\[\]]*?[()][^"\[\]]*?)\]/g,
+          (_, label) => `["${label.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"]`
+        );
+
+        const { svg: renderedSvg } = await mermaid.render(idRef.current, chartToRender);
 
         if (!isMounted) return;
 
