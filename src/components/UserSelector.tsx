@@ -93,14 +93,21 @@ export default function UserSelector({
         }
 
         const data = await response.json();
-        setModelConfig(data);
+        // Restrict visible providers to OpenRouter only (per project scope)
+        const ALLOWED_PROVIDERS = ['openrouter'];
+        const filteredData = {
+          ...data,
+          providers: (data.providers || []).filter((p: Provider) => ALLOWED_PROVIDERS.includes(p.id)),
+          defaultProvider: 'openrouter',
+        };
+        setModelConfig(filteredData);
 
         // Initialize provider and model with defaults from API if not already set
-        if (!provider && data.defaultProvider) {
-          setProvider(data.defaultProvider);
+        if (!provider && filteredData.defaultProvider) {
+          setProvider(filteredData.defaultProvider);
 
           // Find the default provider and set its default model
-          const selectedProvider = data.providers.find((p: Provider) => p.id === data.defaultProvider);
+          const selectedProvider = filteredData.providers.find((p: Provider) => p.id === filteredData.defaultProvider);
           if (selectedProvider && selectedProvider.models.length > 0) {
             setModel(selectedProvider.models[0].id);
           }

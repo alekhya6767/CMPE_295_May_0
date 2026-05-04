@@ -135,8 +135,8 @@ export default function ConfigurationModal({
               </div>
             </div>
 
-            {/* Language selection */}
-            <div className="mb-4">
+            {/* Language selection - hidden (English-only per project scope) */}
+            <div className="hidden mb-4">
               <label htmlFor="language-select" className="block text-sm font-medium text-[var(--foreground)] mb-2">
                 {t.form?.wikiLanguage || 'Wiki Language'}
               </label>

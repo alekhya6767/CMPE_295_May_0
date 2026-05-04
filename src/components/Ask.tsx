@@ -690,8 +690,8 @@ const Ask: React.FC<AskProps> = ({
             </button>
           </div>
 
-          {/* Deep Research toggle */}
-          <div className="flex items-center mt-2 justify-between">
+          {/* Deep Research toggle - hidden (out of scope per project) */}
+          <div className="hidden flex items-center mt-2 justify-between">
             <div className="group relative">
               <label className="flex items-center cursor-pointer">
                 <span className="text-xs text-gray-600 dark:text-gray-400 mr-2">Deep Research</span>

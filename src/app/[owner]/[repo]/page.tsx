@@ -2132,8 +2132,8 @@ IMPORTANT:
                 </button>
               </div>
 
-              {/* Export buttons */}
-              {Object.keys(generatedPages).length > 0 && (
+              {/* Export buttons - hidden (out of scope per project) */}
+              {false && Object.keys(generatedPages).length > 0 && (
                 <div className="mb-5">
                   <h4 className="text-sm font-semibold text-[var(--foreground)] mb-3 font-serif">
                     {messages.repoPage?.exportWiki || 'Export Wiki'}
