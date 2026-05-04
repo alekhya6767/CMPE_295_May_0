@@ -113,7 +113,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
               storedLanguage = detectBrowserLanguage();
     
               // Store the detected language
-              localStorage.setItem('language', storedLanguage);
+              if (typeof window !== 'undefined') {
+                localStorage.setItem('language', storedLanguage);
+              }
             }
           } else {
             console.log('Running on server-side, using default language');

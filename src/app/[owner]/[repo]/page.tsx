@@ -1686,7 +1686,9 @@ IMPORTANT:
 
     // Clear the localStorage cache (if any remnants or if it was used before this change)
     const localStorageCacheKey = getCacheKey(effectiveRepoInfo.owner, effectiveRepoInfo.repo, effectiveRepoInfo.type, language, isComprehensiveView);
-    localStorage.removeItem(localStorageCacheKey);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(localStorageCacheKey);
+    }
 
     // Reset cache loaded flag
     cacheLoadedSuccessfully.current = false;

@@ -63,6 +63,26 @@ const nextConfig: NextConfig = {
         source: '/api/lang/config',
         destination: `${TARGET_SERVER_BASE_URL}/lang/config`,
       },
+      {
+        source: '/api/models/config',
+        destination: `${TARGET_SERVER_BASE_URL}/models/config`,
+      },
+      {
+        source: '/api/chat/completions/stream',
+        destination: `${TARGET_SERVER_BASE_URL}/chat/completions/stream`,
+      },
+      {
+        source: '/api/export/wiki',
+        destination: `${TARGET_SERVER_BASE_URL}/export/wiki`,
+      },
+      {
+        source: '/api/wiki/projects',
+        destination: `${TARGET_SERVER_BASE_URL}/api/processed_projects`,
+      },
+      {
+        source: '/api/processed_projects',
+        destination: `${TARGET_SERVER_BASE_URL}/api/processed_projects`,
+      },
     ];
   },
 };

@@ -82,7 +82,7 @@ export default function Home() {
   const loadConfigFromCache = (repoUrl: string) => {
     if (!repoUrl) return;
     try {
-      const cachedConfigs = localStorage.getItem(REPO_CONFIG_CACHE_KEY);
+      const cachedConfigs = typeof window !== 'undefined' ? localStorage.getItem(REPO_CONFIG_CACHE_KEY) : null;
       if (cachedConfigs) {
         const configs = JSON.parse(cachedConfigs);
         const config = configs[repoUrl.trim()];
@@ -309,7 +309,7 @@ export default function Home() {
     try {
       const currentRepoUrl = repositoryInput.trim();
       if (currentRepoUrl) {
-        const existingConfigs = JSON.parse(localStorage.getItem(REPO_CONFIG_CACHE_KEY) || '{}');
+        const existingConfigs = JSON.parse(typeof window !== 'undefined' ? localStorage.getItem(REPO_CONFIG_CACHE_KEY) || '{}' : '{}');
         const configToSave = {
           selectedLanguage,
           isComprehensiveView,
@@ -320,11 +320,11 @@ export default function Home() {
           selectedPlatform,
           excludedDirs,
           excludedFiles,
-          includedDirs,
-          includedFiles,
         };
         existingConfigs[currentRepoUrl] = configToSave;
-        localStorage.setItem(REPO_CONFIG_CACHE_KEY, JSON.stringify(existingConfigs));
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(REPO_CONFIG_CACHE_KEY, JSON.stringify(existingConfigs));
+        }
       }
     } catch (error) {
       console.error('Error saving config to localStorage:', error);

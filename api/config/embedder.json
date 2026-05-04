@@ -1,10 +1,13 @@
 {
   "embedder": {
     "client_class": "OpenAIClient",
-    "batch_size": 500,
+    "initialize_kwargs": {
+      "api_key": "${OPENROUTER_API_KEY}",
+      "base_url": "https://openrouter.ai/api/v1"
+    },
+    "batch_size": 100,
     "model_kwargs": {
-      "model": "text-embedding-3-small",
-      "dimensions": 256,
+      "model": "google/gemini-embedding-2-preview",
       "encoding_format": "float"
     }
   },
