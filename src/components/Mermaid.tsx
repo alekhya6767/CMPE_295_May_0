@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import mermaid from 'mermaid';
+import { FEATURES } from '@/config/features';
 // We'll use dynamic import for svg-pan-zoom
 
 // Initialize mermaid with defaults - Japanese aesthetic
@@ -235,7 +236,7 @@ const FullScreenModal: React.FC<{
       >
         {/* Modal header with controls */}
         <div className="flex items-center justify-between p-4 border-b border-[var(--border-color)]">
-          <div className="font-medium text-[var(--foreground)] font-serif">図表表示</div>
+          <div className="font-medium text-[var(--foreground)] font-serif">Diagram View</div>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <button
@@ -317,8 +318,9 @@ const Mermaid: React.FC<MermaidProps> = ({ chart, className = '', zoomingEnabled
   );
 
   // Initialize pan-zoom functionality when SVG is rendered
+  // Gated by MERMAID_INTERACTIVE flag (Sem 2 feature)
   useEffect(() => {
-    if (svg && zoomingEnabled && containerRef.current) {
+    if (FEATURES.MERMAID_INTERACTIVE && svg && zoomingEnabled && containerRef.current) {
       const initializePanZoom = async () => {
         const svgElement = containerRef.current?.querySelector("svg");
         if (svgElement) {
@@ -425,12 +427,12 @@ const Mermaid: React.FC<MermaidProps> = ({ chart, className = '', zoomingEnabled
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
-            図表レンダリングエラー
+            Diagram Rendering Error
           </div>
         </div>
         <div ref={mermaidRef} className="text-xs overflow-auto"></div>
         <div className="mt-3 text-xs text-[var(--muted)] font-serif">
-          図表に構文エラーがあり、レンダリングできません。
+          The diagram has a syntax error and cannot be rendered.
         </div>
       </div>
     );
@@ -443,7 +445,7 @@ const Mermaid: React.FC<MermaidProps> = ({ chart, className = '', zoomingEnabled
           <div className="w-2 h-2 bg-[var(--accent-primary)]/70 rounded-full animate-pulse"></div>
           <div className="w-2 h-2 bg-[var(--accent-primary)]/70 rounded-full animate-pulse delay-75"></div>
           <div className="w-2 h-2 bg-[var(--accent-primary)]/70 rounded-full animate-pulse delay-150"></div>
-          <span className="text-[var(--muted)] text-xs ml-2 font-serif">図表を描画中...</span>
+          <span className="text-[var(--muted)] text-xs ml-2 font-serif">Rendering diagram...</span>
         </div>
       </div>
     );

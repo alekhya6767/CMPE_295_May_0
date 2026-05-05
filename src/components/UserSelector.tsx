@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { FEATURES } from '@/config/features';
 
 // Define the interfaces for our model configuration
 interface Model {
@@ -93,13 +94,15 @@ export default function UserSelector({
         }
 
         const data = await response.json();
-        // Restrict visible providers to OpenRouter only (per project scope)
+        // When MULTI_PROVIDER flag is off, restrict visible providers to OpenRouter only
         const ALLOWED_PROVIDERS = ['openrouter'];
-        const filteredData = {
-          ...data,
-          providers: (data.providers || []).filter((p: Provider) => ALLOWED_PROVIDERS.includes(p.id)),
-          defaultProvider: 'openrouter',
-        };
+        const filteredData = FEATURES.MULTI_PROVIDER
+          ? data
+          : {
+              ...data,
+              providers: (data.providers || []).filter((p: Provider) => ALLOWED_PROVIDERS.includes(p.id)),
+              defaultProvider: 'openrouter',
+            };
         setModelConfig(filteredData);
 
         // Initialize provider and model with defaults from API if not already set

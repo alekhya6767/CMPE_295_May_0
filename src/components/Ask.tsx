@@ -8,6 +8,7 @@ import RepoInfo from '@/types/repoinfo';
 import getRepoUrl from '@/utils/getRepoUrl';
 import ModelSelectionModal from './ModelSelectionModal';
 import { createChatWebSocket, closeWebSocket, ChatCompletionRequest } from '@/utils/websocketClient';
+import { FEATURES } from '@/config/features';
 
 interface Model {
   id: string;
@@ -690,8 +691,8 @@ const Ask: React.FC<AskProps> = ({
             </button>
           </div>
 
-          {/* Deep Research toggle - hidden (out of scope per project) */}
-          <div className="hidden flex items-center mt-2 justify-between">
+          {/* Deep Research toggle - gated by DEEP_RESEARCH flag */}
+          <div className={`${FEATURES.DEEP_RESEARCH ? 'flex' : 'hidden'} items-center mt-2 justify-between`}>
             <div className="group relative">
               <label className="flex items-center cursor-pointer">
                 <span className="text-xs text-gray-600 dark:text-gray-400 mr-2">Deep Research</span>

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { FaWikipediaW, FaGithub, FaCoffee, FaTwitter } from 'react-icons/fa';
+import { FaWikipediaW, FaGithub } from 'react-icons/fa';
 import ThemeToggle from '@/components/theme-toggle';
 import Mermaid from '../components/Mermaid';
 import ConfigurationModal from '@/components/ConfigurationModal';
@@ -15,7 +15,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 
 // Define the demo mermaid charts outside the component
 const DEMO_FLOW_CHART = `graph TD
-  A[Code Repository] --> B[DeepWiki]
+  A[Code Repository] --> B[Analyzer]
   B --> C[Architecture Diagrams]
   B --> D[Component Relationships]
   B --> E[Data Flow]
@@ -30,17 +30,17 @@ const DEMO_FLOW_CHART = `graph TD
 
 const DEMO_SEQUENCE_CHART = `sequenceDiagram
   participant User
-  participant DeepWiki
+  participant System
   participant GitHub
 
-  User->>DeepWiki: Enter repository URL
-  DeepWiki->>GitHub: Request repository data
-  GitHub-->>DeepWiki: Return repository data
-  DeepWiki->>DeepWiki: Process and analyze code
-  DeepWiki-->>User: Display wiki with diagrams
+  User->>System: Enter repository URL
+  System->>GitHub: Request repository data
+  GitHub-->>System: Return repository data
+  System->>System: Process and analyze code
+  System-->>User: Display wiki with diagrams
 
   %% Add a note to make text more visible
-  Note over User,GitHub: DeepWiki supports sequence diagrams for visualizing interactions`;
+  Note over User,GitHub: The system generates sequence diagrams to visualize interactions`;
 
 export default function Home() {
   const router = useRouter();
@@ -75,14 +75,14 @@ export default function Home() {
     return key;
   };
 
-  const [repositoryInput, setRepositoryInput] = useState('https://github.com/AsyncFuncAI/deepwiki-open');
+  const [repositoryInput, setRepositoryInput] = useState('https://github.com/tiangolo/fastapi');
 
   const REPO_CONFIG_CACHE_KEY = 'deepwikiRepoConfigCache';
 
   const loadConfigFromCache = (repoUrl: string) => {
     if (!repoUrl) return;
     try {
-      const cachedConfigs = typeof window !== 'undefined' ? localStorage.getItem(REPO_CONFIG_CACHE_KEY) : null;
+      const cachedConfigs = typeof window !== 'undefined' && typeof window.localStorage?.getItem === 'function' ? window.localStorage.getItem(REPO_CONFIG_CACHE_KEY) : null;
       if (cachedConfigs) {
         const configs = JSON.parse(cachedConfigs);
         const config = configs[repoUrl.trim()];
@@ -309,7 +309,7 @@ export default function Home() {
     try {
       const currentRepoUrl = repositoryInput.trim();
       if (currentRepoUrl) {
-        const existingConfigs = JSON.parse(typeof window !== 'undefined' ? localStorage.getItem(REPO_CONFIG_CACHE_KEY) || '{}' : '{}');
+        const existingConfigs = JSON.parse(typeof window !== 'undefined' && typeof window.localStorage?.getItem === 'function' ? window.localStorage.getItem(REPO_CONFIG_CACHE_KEY) || '{}' : '{}');
         const configToSave = {
           selectedLanguage,
           isComprehensiveView,
@@ -322,8 +322,8 @@ export default function Home() {
           excludedFiles,
         };
         existingConfigs[currentRepoUrl] = configToSave;
-        if (typeof window !== 'undefined') {
-          localStorage.setItem(REPO_CONFIG_CACHE_KEY, JSON.stringify(existingConfigs));
+        if (typeof window !== 'undefined' && typeof window.localStorage?.setItem === 'function') {
+          window.localStorage.setItem(REPO_CONFIG_CACHE_KEY, JSON.stringify(existingConfigs));
         }
       }
     } catch (error) {
@@ -545,7 +545,7 @@ export default function Home() {
             <div className="grid grid-cols-1 gap-3 text-xs text-[var(--muted)]">
               <div
                 className="bg-[var(--background)]/70 p-3 rounded border border-[var(--border-color)] font-mono overflow-x-hidden whitespace-nowrap"
-              >https://github.com/AsyncFuncAI/deepwiki-open
+              >https://github.com/tiangolo/fastapi
               </div>
               <div
                 className="bg-[var(--background)]/70 p-3 rounded border border-[var(--border-color)] font-mono overflow-x-hidden whitespace-nowrap"
@@ -553,7 +553,7 @@ export default function Home() {
               </div>
               <div
                 className="bg-[var(--background)]/70 p-3 rounded border border-[var(--border-color)] font-mono overflow-x-hidden whitespace-nowrap"
-              >AsyncFuncAI/deepwiki-open
+              >tiangolo/fastapi
               </div>
               <div
                 className="bg-[var(--background)]/70 p-3 rounded border border-[var(--border-color)] font-mono overflow-x-hidden whitespace-nowrap"
@@ -603,18 +603,11 @@ export default function Home() {
 
           <div className="flex items-center gap-6">
             <div className="flex items-center space-x-5">
-              <a href="https://github.com/AsyncFuncAI/deepwiki-open" target="_blank" rel="noopener noreferrer"
+              <a href="https://github.com/alekhya6767/CMPE_295_May_04" target="_blank" rel="noopener noreferrer"
                 className="text-[var(--muted)] hover:text-[var(--accent-primary)] transition-colors">
                 <FaGithub className="text-xl" />
               </a>
-              <a href="https://buymeacoffee.com/sheing" target="_blank" rel="noopener noreferrer"
-                className="text-[var(--muted)] hover:text-[var(--accent-primary)] transition-colors">
-                <FaCoffee className="text-xl" />
-              </a>
-              <a href="https://x.com/sashimikun_void" target="_blank" rel="noopener noreferrer"
-                className="text-[var(--muted)] hover:text-[var(--accent-primary)] transition-colors">
-                <FaTwitter className="text-xl" />
-              </a>
+              {/* External attribution links removed for project rebrand */}
             </div>
             <ThemeToggle />
           </div>

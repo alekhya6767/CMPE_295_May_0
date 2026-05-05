@@ -5,6 +5,7 @@ import Ask from '@/components/Ask';
 import Markdown from '@/components/Markdown';
 import ModelSelectionModal from '@/components/ModelSelectionModal';
 import ThemeToggle from '@/components/theme-toggle';
+import { FEATURES } from '@/config/features';
 import WikiTreeView from '@/components/WikiTreeView';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { RepoInfo } from '@/types/repoinfo';
@@ -1686,8 +1687,8 @@ IMPORTANT:
 
     // Clear the localStorage cache (if any remnants or if it was used before this change)
     const localStorageCacheKey = getCacheKey(effectiveRepoInfo.owner, effectiveRepoInfo.repo, effectiveRepoInfo.type, language, isComprehensiveView);
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem(localStorageCacheKey);
+    if (typeof window !== 'undefined' && typeof window.localStorage?.removeItem === 'function') {
+      window.localStorage.removeItem(localStorageCacheKey);
     }
 
     // Reset cache loaded flag
@@ -2132,8 +2133,8 @@ IMPORTANT:
                 </button>
               </div>
 
-              {/* Export buttons - hidden (out of scope per project) */}
-              {false && Object.keys(generatedPages).length > 0 && (
+              {/* Export buttons - gated by WIKI_EXPORT flag */}
+              {FEATURES.WIKI_EXPORT && Object.keys(generatedPages).length > 0 && (
                 <div className="mb-5">
                   <h4 className="text-sm font-semibold text-[var(--foreground)] mb-3 font-serif">
                     {messages.repoPage?.exportWiki || 'Export Wiki'}
@@ -2232,14 +2233,14 @@ IMPORTANT:
       <footer className="max-w-[90%] xl:max-w-[1400px] mx-auto mt-8 flex flex-col gap-4 w-full">
         <div className="flex justify-between items-center gap-4 text-center text-[var(--muted)] text-sm h-fit w-full bg-[var(--card-bg)] rounded-lg p-3 shadow-sm border border-[var(--border-color)]">
           <p className="flex-1 font-serif">
-            {messages.footer?.copyright || 'DeepWiki - Generate Wiki from GitHub/Gitlab/Bitbucket repositories'}
+            {messages.footer?.copyright || 'AI-Assisted Repository Understanding System — CMPE 295'}
           </p>
           <ThemeToggle />
         </div>
       </footer>
 
-      {/* Floating Chat Button */}
-      {!isLoading && wikiStructure && (
+      {/* Floating Chat Button (Sem 2 feature, flagged off by default) */}
+      {FEATURES.ASK_QA && !isLoading && wikiStructure && (
         <button
           onClick={() => setIsAskModalOpen(true)}
           className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-[var(--accent-primary)] text-white shadow-lg flex items-center justify-center hover:bg-[var(--accent-primary)]/90 transition-all z-50"
@@ -2249,8 +2250,8 @@ IMPORTANT:
         </button>
       )}
 
-      {/* Ask Modal - Always render but conditionally show/hide */}
-      <div className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 transition-opacity duration-300 ${isAskModalOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+      {/* Ask Modal - Always render but conditionally show/hide (gated by ASK_QA flag) */}
+      <div className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 transition-opacity duration-300 ${FEATURES.ASK_QA && isAskModalOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
         <div className="bg-[var(--card-bg)] rounded-lg shadow-xl w-full max-w-3xl max-h-[80vh] flex flex-col">
           <div className="flex items-center justify-end p-3 absolute top-0 right-0 z-10">
             <button

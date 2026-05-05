@@ -25,8 +25,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Deepwiki Open Source | Sheing Ng",
-  description: "Created by Sheing Ng",
+  title: "AI-Assisted Repository Understanding System | CMPE 295",
+  description: "AI-Assisted Repository Understanding System — SJSU CMPE 295 MS Project",
 };
 
 export default function RootLayout({

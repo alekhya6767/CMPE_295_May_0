@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import UserSelector from './UserSelector';
 import TokenInput from './TokenInput';
+import { FEATURES } from '@/config/features';
 
 interface ConfigurationModalProps {
   isOpen: boolean;
@@ -135,8 +136,8 @@ export default function ConfigurationModal({
               </div>
             </div>
 
-            {/* Language selection - hidden (English-only per project scope) */}
-            <div className="hidden mb-4">
+            {/* Language selection - gated by LANGUAGE_SELECTOR flag */}
+            <div className={`${FEATURES.LANGUAGE_SELECTOR ? '' : 'hidden'} mb-4`}>
               <label htmlFor="language-select" className="block text-sm font-medium text-[var(--foreground)] mb-2">
                 {t.form?.wikiLanguage || 'Wiki Language'}
               </label>
