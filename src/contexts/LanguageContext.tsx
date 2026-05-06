@@ -3,6 +3,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { locales } from '@/i18n';
+import { FEATURES } from '@/config/features';
 
 type Messages = Record<string, any>;
 type LanguageContextType = {
@@ -104,7 +105,13 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         try {
           // Only access localStorage in the browser (guard against Node 25 SSR shim)
           let storedLanguage;
-          if (typeof window !== 'undefined' && typeof window.localStorage?.getItem === 'function') {
+          // When the language selector feature is disabled, force English and wipe any stale stored value
+          if (!FEATURES.LANGUAGE_SELECTOR) {
+            if (typeof window !== 'undefined' && typeof window.localStorage?.removeItem === 'function') {
+              window.localStorage.removeItem('language');
+            }
+            storedLanguage = 'en';
+          } else if (typeof window !== 'undefined' && typeof window.localStorage?.getItem === 'function') {
             storedLanguage = window.localStorage.getItem('language');
     
             // If no language is stored, detect browser language
